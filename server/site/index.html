@@ -1,0 +1,80 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Билеты</title>
+    <script type="text/javascript" src="static/jquery-2.1.4.min.js"></script>
+</head>
+
+<body>
+    <h2>Купить билет</h2>
+    <form id="buyForm" accept-charset="utf-8">
+        <p>
+            <label for="film">Фильм</label>
+            <input type="text" name="film" id="film">
+        </p>
+        <p>
+            <label for="place">Место</label>
+            <input type="text" name="place" id="place" value="1">
+        </p>
+        <p>
+            <input type="submit" value="Купить">&nbsp;
+            <input type="reset" value="Сброс">
+        </p>
+    </form>
+
+    <h2>Уже купленные билеты</h2>
+    <ul id="tickets">
+    </ul>
+    <script type="text/javascript" charset="utf-8">
+        function onDelete(event) {
+            event.preventDefault();
+            $.get("tickets/" + event.target.id + "/delete", function(res) {
+                refreshTickets();
+            })
+        }
+
+        function refreshTickets() {
+            var tickets = $("#tickets");
+
+            tickets.empty()
+            $.getJSON("tickets", function(res) {
+                if (!res.length) {
+                    tickets.html("Список пуст")
+                    return
+                }
+                res.forEach(function(ticket) {
+                    $("<li>").append(
+                        $("<h3>").text(ticket.id),
+                        $("<p>").text("Фильм: " + ticket.seance.film),
+                        $("<p>").text("Дата: " + (new Date(ticket.seance.date)).toLocaleString()),
+                        $("<p>").text("Место: " + ticket.place),
+                        $("<a>", {
+                            id: ticket.id,
+                            href: "#"
+                        }).text("Удалить").click(onDelete)
+                    ).appendTo("#tickets")
+                })
+            })
+        }
+
+
+        $(document).ready(function() {
+            $("#buyForm").submit(function(event) {
+                event.preventDefault();
+                var newTicket = {
+                    place: $("#place").val(),
+                    film: $("#film").val()
+                };
+                $.post("tickets", newTicket, function(res) {
+                    refreshTickets();
+                }, "json")
+            });
+
+
+            refreshTickets();
+        })
+    </script>
+</body>
+
+</html>
