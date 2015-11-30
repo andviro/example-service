@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/andviro/noodle"
-	"github.com/andviro/noodle/web"
 	"github.com/boltdb/bolt"
 	"github.com/julienschmidt/httprouter"
 	"golang.org/x/net/context"
@@ -19,7 +18,7 @@ func (app *Application) Run() error {
 	return http.ListenAndServe(app.Port, app)
 }
 
-func H(h web.Handler) httprouter.Handle {
+func H(h noodle.Handler) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		ctx := context.WithValue(context.TODO(), "params", p)
 		h(ctx, w, r)
